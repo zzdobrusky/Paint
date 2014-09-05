@@ -10,7 +10,9 @@ public class PaintActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_paint);
+        PaintView paintView = new PaintView(this);
+        paintView.setPadding(40, 40, 40, 40);
+        setContentView(paintView);
     }
 
 }
