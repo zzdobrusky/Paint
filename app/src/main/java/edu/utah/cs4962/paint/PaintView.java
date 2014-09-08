@@ -8,6 +8,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -15,10 +16,44 @@ import android.view.View;
  */
 public class PaintView extends View
 {
+    int _color;
+
+    public void setColor(int _color)
+    {
+        this._color = _color;
+        invalidate();
+    }
+
+    public int getColor()
+    {
+        return _color;
+    }
+
+    public void setOnSplotchClickListener(MotionEvent motionEvent)
+    {
+
+    }
+
     public PaintView(Context context)
     {
         super(context);
         setBackgroundColor(0xFF228844);
+//        setOnClickListener(new OnClickListener()
+//        {
+//            @Override
+//            public void onClick(View view)
+//            {
+//                ((PaintView)view).setColor(Color.GREEN);
+//            }
+//        });
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent)
+    {
+
+
+        return true;
     }
 
     @Override
@@ -27,7 +62,7 @@ public class PaintView extends View
         super.onDraw(canvas);
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.GREEN);
+        paint.setColor(_color);
         Path path = new Path();
 
         RectF contentRect = new RectF();
@@ -42,21 +77,22 @@ public class PaintView extends View
 
         float radius = Math.min(contentRect.width() * 0.5f, contentRect.height() * 0.5f);
 
-        int pointCount = 50;
-        float deltaAngle = (float) (2.0f * Math.PI/pointCount);
-        for (int pointIndex=0; pointIndex < pointCount; pointIndex++)
+        int pointCount = 20;
+        float deltaAngle = (float) (2.0f * Math.PI / pointCount);
+        for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
         {
-            float randRadius = (float) (radius + (Math.random() - 0.5) * 2.0 * 0.05 * contentRect.width());
+            float randRadius = (float) (radius + (Math.random() - 0.5) * 5.0 * 0.05 * contentRect.width());
 
             PointF point = new PointF();
-            point.x = center.x + randRadius * (float)Math.cos(pointIndex * deltaAngle);
-            point.y = center.y + randRadius * (float)Math.sin(pointIndex * deltaAngle);
+            point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
+            point.y = center.y + randRadius * (float) Math.sin(pointIndex * deltaAngle);
 
             if (pointIndex == 0)
                 path.moveTo(point.x, point.y);
             else
                 path.lineTo(point.x, point.y);
         }
+        path.close();
 
         canvas.drawPath(path, paint);
 
