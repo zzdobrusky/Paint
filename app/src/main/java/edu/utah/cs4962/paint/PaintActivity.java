@@ -3,31 +3,35 @@ package edu.utah.cs4962.paint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
-
-import java.util.Timer;
 
 public class PaintActivity extends Activity
 {
+    private PaintView _paintView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        PaintView paintView = new PaintView(this);
-        paintView.setColor(Color.RED);
-        paintView.setPadding(40, 40, 40, 40);
-        setContentView(paintView);
+        _paintView = new PaintView(this);
+        _paintView.setColor(Color.DKGRAY);
+        _paintView.setPadding(40, 40, 40, 40);
+        setContentView(_paintView);
 
-        //new Timer()
-//        paintView.setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View view)
-//            {
-//                ((PaintView)view).setColor(Color.GREEN);
-//            }
-//        });
+        _paintView.setOnSplotchTouchListener(new PaintView.OnSplotchTouchListener()
+        {
+            @Override
+            public void onSplotchTouch(PaintView view)
+            {
+                _paintView.setColor(Color.GREEN);
+            }
+
+            @Override
+            public void onSplotchTouchOut(PaintView view)
+            {
+                _paintView.setColor(Color.RED);
+            }
+        });
+
     }
 
     protected void onResume()

@@ -6,8 +6,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -16,7 +16,16 @@ import android.view.View;
  */
 public class PaintView extends View
 {
-    int _color;
+    private int _color;
+    private RectF _contentRect;
+    private float _radius;
+    private OnSplotchTouchListener _onSplotchTouchListener = null;
+
+    public interface OnSplotchTouchListener
+    {
+        public void onSplotchTouch(PaintView paintView);
+        public void onSplotchTouchOut(PaintView paintView);
+    }
 
     public void setColor(int _color)
     {
@@ -29,32 +38,53 @@ public class PaintView extends View
         return _color;
     }
 
-    public void setOnSplotchClickListener(MotionEvent motionEvent)
+    public OnSplotchTouchListener getOnSplotchTouchListener()
     {
+        return _onSplotchTouchListener;
+    }
 
+    public void setOnSplotchTouchListener(OnSplotchTouchListener onSplotchTouchListener)
+    {
+        _onSplotchTouchListener = onSplotchTouchListener;
     }
 
     public PaintView(Context context)
     {
         super(context);
         setBackgroundColor(0xFF228844);
-//        setOnClickListener(new OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View view)
-//            {
-//                ((PaintView)view).setColor(Color.GREEN);
-//            }
-//        });
+        _color = Color.CYAN;
+        _contentRect = new RectF();
     }
 
-    @Override
     public boolean onTouchEvent(MotionEvent motionEvent)
     {
+        float x = motionEvent.getX();
+        float y = motionEvent.getY();
 
+        float circleCenterX = _contentRect.centerX();
+        float circleCenterY = _contentRect.centerY();
 
-        return true;
+        float distance = (float)Math.sqrt(
+                (circleCenterX - x)*(circleCenterX - x) +
+                (circleCenterY - y)*(circleCenterY - y));
+
+        if(distance < _radius)
+        {
+            Log.i("paint_view", "Touch inside the circle!");
+            // raise event
+            if(_onSplotchTouchListener != null)
+                _onSplotchTouchListener.onSplotchTouch(this);
+        }
+        else
+        {
+            Log.i("paint_view", "Touch outside the circle!");
+            if(_onSplotchTouchListener != null)
+                _onSplotchTouchListener.onSplotchTouchOut(this);
+        }
+
+        return super.onTouchEvent(motionEvent);
     }
+
 
     @Override
     protected void onDraw(Canvas canvas)
@@ -65,23 +95,21 @@ public class PaintView extends View
         paint.setColor(_color);
         Path path = new Path();
 
-        RectF contentRect = new RectF();
-        contentRect.left = getPaddingLeft();
-        contentRect.top = getPaddingTop();
-        contentRect.right = getWidth() - getPaddingRight();
-        contentRect.bottom = getHeight() - getPaddingBottom();
+        _contentRect.left = getPaddingLeft();
+        _contentRect.top = getPaddingTop();
+        _contentRect.right = getWidth() - getPaddingRight();
+        _contentRect.bottom = getHeight() - getPaddingBottom();
 
-        PointF center = new PointF(contentRect.centerX(), contentRect.centerY());
-//        center.x = (float) getWidth() * 0.5f;
-//        center.y = (float) getHeight() * 0.5f;
+        PointF center = new PointF(_contentRect.centerX(), _contentRect.centerY());
 
-        float radius = Math.min(contentRect.width() * 0.5f, contentRect.height() * 0.5f);
+
+        _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
         int pointCount = 20;
         float deltaAngle = (float) (2.0f * Math.PI / pointCount);
         for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
         {
-            float randRadius = (float) (radius + (Math.random() - 0.5) * 5.0 * 0.05 * contentRect.width());
+            float randRadius = _radius;//(float) (_radius + (Math.random() - 0.5) * 5.0 * 0.05 * _contentRect.width());
 
             PointF point = new PointF();
             point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
@@ -95,27 +123,5 @@ public class PaintView extends View
         path.close();
 
         canvas.drawPath(path, paint);
-
-//        Paint linePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//        linePaint.setStrokeWidth(5.0f);
-//
-//        canvas.clipRect(new Rect(50, 20, 350, 500));
-//
-//        canvas.drawLine(10.0f, 10.0f, 100.0f, 100.0f, linePaint);
-//
-//        float[] pts = {35.4f, 435.4f, 232.4f, 97.3f, 87.5f, 243.4f, 93.4f, 974.4f};
-//        canvas.drawLines(pts, linePaint);
-//
-//        linePaint.setColor(0x7F0000FF);
-//        canvas.drawOval(new RectF(40.5f, 86.4f, 440.5f, 186.4f), linePaint);
-//
-//        Path path = new Path();
-//        linePaint.setColor(Color.RED);
-//        linePaint.setStyle(Paint.Style.STROKE);
-//        path.moveTo(40.0f, 200.0f);
-//        path.lineTo(250.0f, 600.0f);
-//        path.lineTo(600.0f, 50.0f);
-//        path.close();
-//        canvas.drawPath(path, linePaint);
     }
 }
