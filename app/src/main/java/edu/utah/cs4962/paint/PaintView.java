@@ -105,11 +105,11 @@ public class PaintView extends View
 
         _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
-        int pointCount = 20;
+        int pointCount = 100;
         float deltaAngle = (float) (2.0f * Math.PI / pointCount);
         for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
         {
-            float randRadius = _radius;//(float) (_radius + (Math.random() - 0.5) * 5.0 * 0.05 * _contentRect.width());
+            float randRadius = (float) (_radius + (Math.random() - 0.5) * 5.0 * 0.05 * _contentRect.width());//_radius;//
 
             PointF point = new PointF();
             point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
@@ -124,4 +124,33 @@ public class PaintView extends View
 
         canvas.drawPath(path, paint);
     }
+
+//    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+//    {
+//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+//
+//        int widthSpec = MeasureSpec.getSize(widthMode);
+//        int heightSpec = MeasureSpec.getSize(heightMode);
+//
+//        int width = getSuggestedMinimumWidth();
+//        int height = getSuggestedMinimumHeight();
+//
+//
+//        if(width > height && widthMode == MeasureSpec.EXACTLY)
+//            width = height;
+//
+//        if(width < height && heightMode == MeasureSpec.EXACTLY)
+//            height = heightSpec;
+//
+//        // TODO: the rest
+//
+//
+//
+//        setMeasuredDimension(
+//                resolveSizeAndState(width, widthSpec, 0),
+//                resolveSizeAndState(height, heightSpec, 0)
+//        );
+//    }
 }

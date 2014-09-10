@@ -3,6 +3,7 @@ package edu.utah.cs4962.paint;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 public class PaintActivity extends Activity
 {
@@ -12,10 +13,15 @@ public class PaintActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        LinearLayout rootLayout = new LinearLayout(this);
         _paintView = new PaintView(this);
         _paintView.setColor(Color.DKGRAY);
         _paintView.setPadding(40, 40, 40, 40);
-        setContentView(_paintView);
+
+        rootLayout.addView(_paintView);
+
+        setContentView(rootLayout);
 
         _paintView.setOnSplotchTouchListener(new PaintView.OnSplotchTouchListener()
         {
