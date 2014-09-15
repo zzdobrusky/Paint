@@ -54,8 +54,11 @@ public class PaintView extends View
         setBackgroundColor(0xFF228844);
         _color = Color.CYAN;
         _contentRect = new RectF();
+        setMinimumWidth(50);
+        setMinimumHeight(50);
     }
 
+    @Override
     public boolean onTouchEvent(MotionEvent motionEvent)
     {
         float x = motionEvent.getX();
@@ -109,7 +112,7 @@ public class PaintView extends View
         float deltaAngle = (float) (2.0f * Math.PI / pointCount);
         for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
         {
-            float randRadius = (float) (_radius + (Math.random() - 0.5) * 5.0 * 0.05 * _contentRect.width());//_radius;//
+            float randRadius = (float) (_radius + (Math.random() - 1) * 5.0 * 0.05 * _contentRect.width());//_radius;//
 
             PointF point = new PointF();
             point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
@@ -126,6 +129,25 @@ public class PaintView extends View
     }
 
 //    @Override
+//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+//    {
+//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+//
+//        int widthSpec = MeasureSpec.getSize(widthMeasureSpec);
+//        int heightSpec = MeasureSpec.getSize(heightMeasureSpec);
+//
+//        // start small and get bigger
+//        int width = getSuggestedMinimumWidth();
+//        int height = getSuggestedMinimumHeight();
+//
+//        setMeasuredDimension(
+//                resolveSizeAndState(width, widthMeasureSpec, 0),
+//                resolveSizeAndState(height, heightMeasureSpec, 0)
+//        );
+//    }
+
+    //    @Override
 //    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 //    {
 //        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
