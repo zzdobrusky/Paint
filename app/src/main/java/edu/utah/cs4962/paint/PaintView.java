@@ -128,6 +128,7 @@ public class PaintView extends View
         canvas.drawPath(path, paint);
     }
 
+
 //    @Override
 //    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
 //    {

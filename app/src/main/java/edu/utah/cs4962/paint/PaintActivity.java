@@ -14,29 +14,33 @@ public class PaintActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
-        LinearLayout rootLayout = new LinearLayout(this);
-        _paintView = new PaintView(this);
-        _paintView.setColor(Color.DKGRAY);
-        _paintView.setPadding(40, 40, 40, 40);
+        PaletteView rootLayout = new PaletteView(this);
 
-        rootLayout.addView(_paintView);
+        for(int splotchIndex=0; splotchIndex<10; splotchIndex++)
+        {
+            _paintView = new PaintView(this);
+            _paintView.setColor(Color.DKGRAY);
+            //_paintView.setPadding(40, 40, 40, 40);
+
+            rootLayout.addView(_paintView);
+
+            _paintView.setOnSplotchTouchListener(new PaintView.OnSplotchTouchListener()
+            {
+                @Override
+                public void onSplotchTouch(PaintView view)
+                {
+                    _paintView.setColor(Color.GREEN);
+                }
+
+                @Override
+                public void onSplotchTouchOut(PaintView view)
+                {
+                    _paintView.setColor(Color.RED);
+                }
+            });
+        }
 
         setContentView(rootLayout);
-
-        _paintView.setOnSplotchTouchListener(new PaintView.OnSplotchTouchListener()
-        {
-            @Override
-            public void onSplotchTouch(PaintView view)
-            {
-                _paintView.setColor(Color.GREEN);
-            }
-
-            @Override
-            public void onSplotchTouchOut(PaintView view)
-            {
-                _paintView.setColor(Color.RED);
-            }
-        });
 
     }
 
