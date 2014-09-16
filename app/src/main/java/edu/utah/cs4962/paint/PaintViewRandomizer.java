@@ -14,18 +14,18 @@ import android.view.View;
 /**
  * Created by zbynek on 9/5/2014.
  */
-public class PaintView extends View
+public class PaintViewRandomizer extends View
 {
     private int _color;
     private RectF _contentRect;
     private float _radius;
     private OnSplotchTouchListener _onSplotchTouchListener = null;
-    private int _pointCount = 30; // dividable by 3
+    private int _pointCount = 100;
 
     public interface OnSplotchTouchListener
     {
-        public void onSplotchTouch(PaintView paintView);
-        public void onSplotchTouchOut(PaintView paintView);
+        public void onSplotchTouch(PaintViewRandomizer paintViewRandomizer);
+        public void onSplotchTouchOut(PaintViewRandomizer paintViewRandomizer);
     }
 
     public void setColor(int _color)
@@ -49,7 +49,7 @@ public class PaintView extends View
         _onSplotchTouchListener = onSplotchTouchListener;
     }
 
-    public PaintView(Context context)
+    public PaintViewRandomizer(Context context)
     {
         super(context);
         setBackgroundColor(Color.LTGRAY);
@@ -70,7 +70,7 @@ public class PaintView extends View
 
         float distance = (float)Math.sqrt(
                 (circleCenterX - x)*(circleCenterX - x) +
-                (circleCenterY - y)*(circleCenterY - y));
+                        (circleCenterY - y)*(circleCenterY - y));
 
         if(distance < _radius)
         {
@@ -97,9 +97,6 @@ public class PaintView extends View
 
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(_color);
-        //paint.setStyle(Paint.Style.STROKE); // for testing only
-        //paint.setStrokeWidth(4.0f);
-        //paint.setColor(Color.BLUE);
         Path path = new Path();
 
         _contentRect.left = getPaddingLeft();
@@ -109,39 +106,53 @@ public class PaintView extends View
 
         PointF center = new PointF(_contentRect.centerX(), _contentRect.centerY());
 
+
         _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
+        boolean goingUp = false;
+        int countDownRandomizer = _pointCount/4;
+        int upDownOffset = 2;
+        int randomizerBase = countDownRandomizer/2;
+        int countDownToChange = (int) (Math.random() * countDownRandomizer);
         float deltaAngle = (float) (2.0f * Math.PI / _pointCount);
-        PointF point0 = getRandomPoint(deltaAngle, center.x, center.y, 0);
-        path.moveTo(point0.x, point0.y);
-
-        for (int pointIndex = 1; pointIndex < _pointCount; pointIndex += 3)
+        float baseRadius = _radius/2;
+        float randRadius = baseRadius;
+        for (int pointIndex = 0; pointIndex < _pointCount; pointIndex++)
         {
-            PointF point1 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
-            PointF point2 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
-            PointF point3;
-            if(pointIndex == _pointCount - 2)
-                point3 = point0;
+            if ( goingUp )
+            {
+                // mostly go up (but allow a few jags down)
+                randRadius += (float) (Math.round(Math.random() * randomizerBase) - upDownOffset);
+            }
             else
-                point3 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
+            {
+                // mostly go down (but allow a few jags up)
+                randRadius += (float) (Math.round(Math.random() * randomizerBase) - (randomizerBase - upDownOffset));
+            }
 
-            //path.lineTo(point.x, point.y);
-            path.cubicTo(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
+
+            // now figure out if we need to start moving in the opposite direction.
+            // and make sure it doesn't go over the edge
+            countDownToChange--;
+            if ( countDownToChange <= 0 || randRadius >= _radius || randRadius <= _radius/4)
+            {
+                countDownToChange = (int) (Math.random() * countDownRandomizer); //+ _pointCount/4);
+                goingUp = !goingUp;
+            }
+
+
+            PointF point = new PointF();
+            point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
+            point.y = center.y + randRadius * (float) Math.sin(pointIndex * deltaAngle);
+
+            if (pointIndex == 0)
+                path.moveTo(point.x, point.y);
+            else
+                path.lineTo(point.x, point.y);
         }
-        //path.close();
+        path.close();
 
         canvas.drawPath(path, paint);
-    }
-
-    private PointF getRandomPoint(float angle, float centerX, float centerY, int pointIndex)
-    {
-        float halfRadius = _radius/2;
-        float randRadius = halfRadius + (float) (Math.random() - 0.5) * halfRadius;
-        PointF point = new PointF();
-        point.x = centerX + randRadius * (float) Math.cos(pointIndex * angle);
-        point.y = centerY + randRadius * (float) Math.sin(pointIndex * angle);
-
-        return point;
     }
 
 
