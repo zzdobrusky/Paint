@@ -20,6 +20,7 @@ public class PaintView extends View
     private RectF _contentRect;
     private float _radius;
     private OnSplotchTouchListener _onSplotchTouchListener = null;
+    private int _pointCount = 400;
 
     public interface OnSplotchTouchListener
     {
@@ -51,7 +52,7 @@ public class PaintView extends View
     public PaintView(Context context)
     {
         super(context);
-        setBackgroundColor(0xFF228844);
+        setBackgroundColor(Color.LTGRAY);
         _color = Color.CYAN;
         _contentRect = new RectF();
         setMinimumWidth(50);
@@ -108,11 +109,34 @@ public class PaintView extends View
 
         _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
-        int pointCount = 100;
-        float deltaAngle = (float) (2.0f * Math.PI / pointCount);
-        for (int pointIndex = 0; pointIndex < pointCount; pointIndex++)
+        boolean goingUp = false;
+        int countDownToChange = (int) (Math.random() * _pointCount);
+        float deltaAngle = (float) (2.0f * Math.PI / _pointCount);
+        float baseRadius = _radius/2;
+        float randRadius;
+        for (int pointIndex = 0; pointIndex < _pointCount; pointIndex++)
         {
-            float randRadius = (float) (_radius + (Math.random() - 1) * 5.0 * 0.05 * _contentRect.width());//_radius;//
+            if ( goingUp )
+            {
+                // mostly go up (but allow a few jags down)
+                randRadius = baseRadius + (float) (Math.round(Math.random() * 6) - 2);
+            }
+            else
+            {
+                // mostly go down (but allow a few jags up)
+                randRadius = baseRadius + (float) (Math.round(Math.random() * 6) - 4);
+            }
+
+
+            // now figure out if we need to start moving in the opposite direction.
+            // and make sure it doesn't go over the edge
+            countDownToChange--;
+            if ( countDownToChange <= 0 || randRadius >= _radius)
+            {
+                countDownToChange = 50;//(int) (Math.random() * _pointCount);
+                goingUp = !goingUp;
+            }
+
 
             PointF point = new PointF();
             point.x = center.x + randRadius * (float) Math.cos(pointIndex * deltaAngle);
@@ -129,51 +153,48 @@ public class PaintView extends View
     }
 
 
-//    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-//    {
-//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-//
-//        int widthSpec = MeasureSpec.getSize(widthMeasureSpec);
-//        int heightSpec = MeasureSpec.getSize(heightMeasureSpec);
-//
-//        // start small and get bigger
-//        int width = getSuggestedMinimumWidth();
-//        int height = getSuggestedMinimumHeight();
-//
-//        setMeasuredDimension(
-//                resolveSizeAndState(width, widthMeasureSpec, 0),
-//                resolveSizeAndState(height, heightMeasureSpec, 0)
-//        );
-//    }
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
+    {
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-    //    @Override
-//    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-//    {
-//        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-//        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
-//
-//        int widthSpec = MeasureSpec.getSize(widthMode);
-//        int heightSpec = MeasureSpec.getSize(heightMode);
-//
-//        int width = getSuggestedMinimumWidth();
-//        int height = getSuggestedMinimumHeight();
-//
-//
-//        if(width > height && widthMode == MeasureSpec.EXACTLY)
-//            width = height;
-//
-//        if(width < height && heightMode == MeasureSpec.EXACTLY)
-//            height = heightSpec;
-//
-//        // TODO: the rest
-//
-//
-//
-//        setMeasuredDimension(
-//                resolveSizeAndState(width, widthSpec, 0),
-//                resolveSizeAndState(height, heightSpec, 0)
-//        );
-//    }
+        int widthSpec = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSpec = MeasureSpec.getSize(heightMeasureSpec);
+
+        // start small and get bigger
+        int width = getSuggestedMinimumWidth();
+        int height = getSuggestedMinimumHeight();
+
+        if(widthMode == MeasureSpec.AT_MOST)
+            width = widthSpec;
+        if(heightMode == MeasureSpec.AT_MOST)
+            height = heightSpec;
+
+        if (widthMode == MeasureSpec.EXACTLY)
+        {
+            width = widthSpec;
+            height = width;
+        }
+
+        if (heightMode == MeasureSpec.EXACTLY)
+        {
+            height = heightSpec;
+            width = height;
+        }
+
+        // TODO: respect padding
+        // make sure that it is squared
+        if (width > height && widthMode != MeasureSpec.EXACTLY)
+            width = height;
+        if (height > width && heightMode != MeasureSpec.EXACTLY)
+            height = width;
+
+        setMeasuredDimension(
+                resolveSizeAndState(width, widthMeasureSpec,
+                        width < getSuggestedMinimumWidth() ? MEASURED_STATE_TOO_SMALL : 0),
+                resolveSizeAndState(height, heightMeasureSpec,
+                        height < getSuggestedMinimumHeight() ? MEASURED_STATE_TOO_SMALL : 0)
+        );
+    }
 }
