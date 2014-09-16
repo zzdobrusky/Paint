@@ -20,7 +20,7 @@ public class PaintView extends View
     private RectF _contentRect;
     private float _radius;
     private OnSplotchTouchListener _onSplotchTouchListener = null;
-    private int _pointCount = 400;
+    private int _pointCount = 50;
 
     public interface OnSplotchTouchListener
     {
@@ -110,30 +110,30 @@ public class PaintView extends View
         _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
         boolean goingUp = false;
-        int countDownToChange = (int) (Math.random() * _pointCount);
+        int countDownToChange = (int) (Math.random() * _pointCount/4);// + _pointCount/4);
         float deltaAngle = (float) (2.0f * Math.PI / _pointCount);
         float baseRadius = _radius/2;
-        float randRadius;
+        float randRadius = baseRadius;
         for (int pointIndex = 0; pointIndex < _pointCount; pointIndex++)
         {
             if ( goingUp )
             {
                 // mostly go up (but allow a few jags down)
-                randRadius = baseRadius + (float) (Math.round(Math.random() * 6) - 2);
+                randRadius += (float) (Math.round(Math.random() * 12) - 1);
             }
             else
             {
                 // mostly go down (but allow a few jags up)
-                randRadius = baseRadius + (float) (Math.round(Math.random() * 6) - 4);
+                randRadius += (float) (Math.round(Math.random() * 12) - 11);
             }
 
 
             // now figure out if we need to start moving in the opposite direction.
             // and make sure it doesn't go over the edge
             countDownToChange--;
-            if ( countDownToChange <= 0 || randRadius >= _radius)
+            if ( countDownToChange <= 0 || randRadius >= _radius || randRadius < _radius/4)
             {
-                countDownToChange = 50;//(int) (Math.random() * _pointCount);
+                countDownToChange = (int) (Math.random() * _pointCount/4); //+ _pointCount/4);
                 goingUp = !goingUp;
             }
 
