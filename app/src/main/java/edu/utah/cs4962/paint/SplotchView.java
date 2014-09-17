@@ -14,7 +14,7 @@ import android.view.View;
 /**
  * Created by zbynek on 9/5/2014.
  */
-public class PaintView extends View
+public class SplotchView extends View
 {
     private int _color;
     private RectF _contentRect;
@@ -24,8 +24,8 @@ public class PaintView extends View
 
     public interface OnSplotchTouchListener
     {
-        public void onSplotchTouch(PaintView paintView);
-        public void onSplotchTouchOut(PaintView paintView);
+        public void onSplotchTouch(SplotchView splotchView);
+        public void onSplotchTouchOut(SplotchView splotchView);
     }
 
     public void setColor(int _color)
@@ -49,7 +49,7 @@ public class PaintView extends View
         _onSplotchTouchListener = onSplotchTouchListener;
     }
 
-    public PaintView(Context context)
+    public SplotchView(Context context)
     {
         super(context);
         setBackgroundColor(Color.LTGRAY);
@@ -62,6 +62,7 @@ public class PaintView extends View
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent)
     {
+        // get location of touch
         float x = motionEvent.getX();
         float y = motionEvent.getY();
 
@@ -112,6 +113,7 @@ public class PaintView extends View
         _radius = Math.min(_contentRect.width() * 0.5f, _contentRect.height() * 0.5f);
 
         float deltaAngle = (float) (2.0f * Math.PI / _pointCount);
+        // remember the first point to close the path after
         PointF point0 = getRandomPoint(deltaAngle, center.x, center.y, 0);
         path.moveTo(point0.x, point0.y);
 
@@ -120,16 +122,14 @@ public class PaintView extends View
             PointF point1 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
             PointF point2 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
             PointF point3;
+            // make sure the path closes
             if(pointIndex == _pointCount - 2)
                 point3 = point0;
             else
                 point3 = getRandomPoint(deltaAngle, center.x, center.y, pointIndex);
 
-            //path.lineTo(point.x, point.y);
             path.cubicTo(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
         }
-        //path.close();
-
         canvas.drawPath(path, paint);
     }
 

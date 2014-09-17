@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 
 public class PaintActivity extends Activity
 {
-    private PaintView _paintView;
+    private SplotchView _splotchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -19,27 +19,27 @@ public class PaintActivity extends Activity
         LinearLayout rootLayout = new LinearLayout(this);
         rootLayout.setOrientation(LinearLayout.VERTICAL);
 
-        _paintView = new PaintView(this);
-        _paintView.setColor(Color.DKGRAY);
-        _paintView.setPadding(40, 40, 40, 40);
+        _splotchView = new SplotchView(this);
+        _splotchView.setColor(Color.DKGRAY);
+        _splotchView.setPadding(40, 40, 40, 40);
 
-        rootLayout.addView(_paintView, new LinearLayout.LayoutParams(
+        rootLayout.addView(_splotchView, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         ));
 
-        _paintView.setOnSplotchTouchListener(new PaintView.OnSplotchTouchListener()
+        _splotchView.setOnSplotchTouchListener(new SplotchView.OnSplotchTouchListener()
         {
             @Override
-            public void onSplotchTouch(PaintView view)
+            public void onSplotchTouch(SplotchView view)
             {
-                _paintView.setColor(Color.GREEN);
+                _splotchView.setColor(Color.GREEN);
             }
 
             @Override
-            public void onSplotchTouchOut(PaintView view)
+            public void onSplotchTouchOut(SplotchView view)
             {
-                _paintView.setColor(Color.RED);
+                _splotchView.setColor(Color.RED);
             }
         });
 
