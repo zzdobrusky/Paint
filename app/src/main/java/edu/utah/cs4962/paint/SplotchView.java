@@ -19,6 +19,19 @@ public class SplotchView extends View
     private int _color;
     private RectF _contentRect;
     private float _radius;
+
+    public boolean isActive()
+    {
+        return _isActive;
+    }
+
+    public void setActive(boolean isActive)
+    {
+        _isActive = isActive;
+        invalidate();
+    }
+
+    boolean _isActive = false;
     private OnSplotchTouchListener _onSplotchTouchListener = null;
     private int _pointCount = 30; // dividable by 3
 
@@ -52,7 +65,7 @@ public class SplotchView extends View
     public SplotchView(Context context)
     {
         super(context);
-        setBackgroundColor(Color.LTGRAY);
+        //setBackgroundColor(Color.LTGRAY);
         _color = Color.CYAN;
         _contentRect = new RectF();
         setMinimumWidth(50);
@@ -131,6 +144,14 @@ public class SplotchView extends View
             path.cubicTo(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
         }
         canvas.drawPath(path, paint);
+
+        if(_isActive)
+        {
+            paint.setStyle(Paint.Style.STROKE);
+            paint.setStrokeWidth(6.0f);
+            paint.setColor(Color.YELLOW);
+            canvas.drawPath(path, paint);
+        }
     }
 
     private PointF getRandomPoint(float angle, float centerX, float centerY, int pointIndex)
